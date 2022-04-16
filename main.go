@@ -4,21 +4,16 @@ import (
 	"fmt"
 )
 
-type s struct {
-	a string
-	b string
-}
+func canIDrink(age int) bool {
 
-func superAdd(numbers ...int) int {
-	total := 0
-	for _, number := range numbers {
-		total += number
+	if koreanAge := age + 2; koreanAge < 18 {
+		return false
 	}
+	return true
 
-	return total
 }
 
 func main() {
-	sum := superAdd(1, 2, 3, 4, 5, 6)
-	fmt.Println(sum)
+
+	fmt.Println(canIDrink(16))
 }
