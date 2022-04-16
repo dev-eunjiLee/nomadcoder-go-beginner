@@ -3,15 +3,10 @@ package main
 import "fmt"
 
 func main() {
-	names := [5]string{"nico", "lynn", "dal"}
-	names[3] = "3"
-	names[4] = "4"
-
-	slice := []string{"nico", "lynn", "dal"}
-	newSlice := append(slice, "3")
-
-	fmt.Println(names)
-	fmt.Println(slice)
-	fmt.Println(newSlice)
-
+	nico := map[string]string{"name": "nico", "age": "12"}
+	// * for문을 이용해 map 열거
+	for key, value := range nico {
+		fmt.Println(key, value)
+	}
+	fmt.Println(nico)
 }
