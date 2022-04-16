@@ -2,20 +2,23 @@ package main
 
 import (
 	"fmt"
-	"strings"
 )
 
-func lenAndUpper(name string) (length int, uppercase string) {
+type s struct {
+	a string
+	b string
+}
 
-	defer fmt.Println("I'm done")
+func superAdd(numbers ...int) int {
+	total := 0
+	for _, number := range numbers {
+		total += number
+	}
 
-	length = len(name)
-	uppercase = strings.ToUpper(name)
-
-	return
+	return total
 }
 
 func main() {
-	totalLength, uppercase := lenAndUpper("nico")
-	fmt.Println("main", totalLength, uppercase)
+	sum := superAdd(1, 2, 3, 4, 5, 6)
+	fmt.Println(sum)
 }
