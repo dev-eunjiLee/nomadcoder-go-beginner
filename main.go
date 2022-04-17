@@ -7,26 +7,29 @@ import (
 
 func main() {
 
-	word := "first"
-	def := "First word"
+	dictionary := mydict.Dictionary{}
 
-	dictionary := mydict.Dictionary{word: def}
+	baseWord := "hello"
 
-	word = "name"
-	def = "ethan"
+	dictionary.Add(baseWord, "First")
 
-	addErr := dictionary.Add(word, def)
-
-	if addErr != nil {
-		fmt.Println(addErr)
-	}
-
-	definition, err := dictionary.Search("name")
+	err := dictionary.Update(baseWord, "Second")
 
 	if err != nil {
 		fmt.Println(err)
-	} else {
-		fmt.Println(definition)
 	}
+
+	word, _ := dictionary.Search(baseWord)
+	fmt.Println(word)
+
+	deleteWord := "hello"
+	dictionary.Delete(deleteWord)
+	word2, err2 := dictionary.Search(deleteWord)
+
+	if err2 != nil {
+		fmt.Println(err2)
+	}
+
+	fmt.Println("after Delete ", word2)
 
 }
