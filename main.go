@@ -16,10 +16,4 @@ func main() {
 		fmt.Println(definition)
 	}
 
-	definition2, err2 := dictionary.SearchForStudy("first")
-	if err2 != nil {
-		fmt.Println(err2)
-	} else {
-		fmt.Println(definition2)
-	}
 }
