@@ -6,9 +6,22 @@ import (
 )
 
 func main() {
-	dictionary := mydict.Dictionary{"first": "First word"}
-	fmt.Println(&dictionary)
-	definition, err := dictionary.Search("first")
+
+	word := "first"
+	def := "First word"
+
+	dictionary := mydict.Dictionary{word: def}
+
+	word = "name"
+	def = "ethan"
+
+	addErr := dictionary.Add(word, def)
+
+	if addErr != nil {
+		fmt.Println(addErr)
+	}
+
+	definition, err := dictionary.Search("name")
 
 	if err != nil {
 		fmt.Println(err)
