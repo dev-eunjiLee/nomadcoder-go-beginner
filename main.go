@@ -39,6 +39,7 @@ func hitURL(url string) error {
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode >= 400 {
 		fmt.Println(err, resp.StatusCode)
+		fmt.Println("test")
 		return errRequestFailed
 	}
 	return nil
