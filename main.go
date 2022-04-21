@@ -2,27 +2,42 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"net/http"
 )
 
-func main() {
-	c := make(chan string)
-	people := [2]string{"nico", "flynn"}
-	for _, person := range people {
-		go isSexy(person, c)
-	}
-	//result := <-c // 메인에서 채널의 결과를 기다리고 있으면, 메인 함수가 끝나지 않는다.
-	//fmt.Println(result)
-
-	//time.Sleep(time.Second * 3)
-	for i := 0; i < len(people); i++ {
-
-		fmt.Println(<-c)
-	}
-
+type result struct {
+	url    string
+	status string
 }
 
-func isSexy(person string, c chan string) {
-	time.Sleep(time.Second * 1)
-	c <- person + " is Sexy"
+func main() {
+
+	c := make(chan result)
+	//var results = make(map[string]string)
+
+	urls := []string{
+		"https://www.naver.com/",
+		"https://nomadcoders.co/",
+		"https://github.com/",
+		"https://www.reddit.com/",
+	}
+
+	for _, url := range urls {
+		go hitURL(url, c)
+		fmt.Println(<-c)
+	}
+}
+
+func hitURL(url string, c chan<- result) {
+	fmt.Println("Checking: ", url)
+	resp, err := http.Get(url)
+	status := "OK"
+	if err != nil || resp.StatusCode >= 400 {
+		status = "FAILED"
+	}
+	c <- result{
+		url:    url,
+		status: status,
+	}
+
 }
