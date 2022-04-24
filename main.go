@@ -5,16 +5,30 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 var baseUrl string = "https://kr.indeed.com/%EC%B7%A8%EC%97%85?q=python&limit=50&vjk=6dd48f3771d01215"
 
 func main() {
-	getPages()
+	totalPages := getPages()
+	fmt.Println(totalPages)
+
+	for i := 0; i < totalPages; i++ {
+		getPage(i)
+	}
+}
+
+func getPage(page int) {
+	pageURL := baseUrl + "&start=" + strconv.Itoa(page*50)
+	fmt.Println("Requesting", pageURL)
 }
 
 // getPages: 페이지 수 리턴하는 함수
-func getPages() {
+func getPages() int {
+
+	pages := 0
+
 	res, err := http.Get(baseUrl)
 
 	// 에러가 난 경우 프로그램 종료
@@ -29,10 +43,10 @@ func getPages() {
 	checkErr(err)
 
 	doc.Find(".pagination ").Each(func(i int, s *goquery.Selection) {
-		fmt.Println(i, s.Text())
+		pages = s.Find("a").Length()
 	})
 
-	fmt.Println(doc)
+	return pages
 }
 
 func checkErr(err error) {
