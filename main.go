@@ -22,6 +22,20 @@ func main() {
 func getPage(page int) {
 	pageURL := baseUrl + "&start=" + strconv.Itoa(page*50)
 	fmt.Println("Requesting", pageURL)
+	res, err := http.Get(pageURL)
+	checkErr(err)
+	checkCode(res)
+
+	defer res.Body.Close() // res.Body는 IO(입력과 출력)으로 함수가 끝났을 때 닫아야 한다
+
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	checkErr(err)
+	searchCards := doc.Find(".tapItem")
+	searchCards.Each(func(i int, s *goquery.Selection) {
+		id, _ := s.Find("div>h2>a").Attr("data-jk")
+		//text := s.Find("h2>a").Attr('"da')
+		fmt.Println(id)
+	})
 }
 
 // getPages: 페이지 수 리턴하는 함수
