@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -29,7 +31,30 @@ func main() {
 		jobs = append(jobs, extractedJobs...)
 	}
 
-	fmt.Println(jobs)
+	writeJobs(jobs)
+}
+
+func writeJobs(jobs []extractedJob) {
+	file, err := os.Create("jobs.csv")
+	checkErr(err)
+
+	w := csv.NewWriter(file)
+
+	// Writer.Flush(): 이 시점에 파일에 데이터가 입력된다
+	// for문까지 다 돌고 나면 Write된 데이터가 파일에 입력!
+	defer w.Flush()
+
+	headers := []string{"ID", "Title", "Location", "Salary", "Summary"}
+	wErr := w.Write(headers)
+	checkErr(wErr)
+
+	for _, job := range jobs {
+		jobSlice := []string{"https://kr.indeed.com/viewjob?jk=" + job.id, job.title, job.location, job.salary, job.summary}
+		jwErr := w.Write(jobSlice)
+		checkErr(jwErr)
+	}
+
+	fmt.Println("Done, extracted", len(jobs))
 }
 
 func getPage(page int) []extractedJob {
