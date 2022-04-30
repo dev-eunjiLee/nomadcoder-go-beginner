@@ -44,7 +44,7 @@ func writeJobs(jobs []extractedJob) {
 	// for문까지 다 돌고 나면 Write된 데이터가 파일에 입력!
 	defer w.Flush()
 
-	headers := []string{"ID", "Title", "Location", "Salary", "Summary"}
+	headers := []string{"Link", "Title", "Location", "Salary", "Summary"}
 	wErr := w.Write(headers)
 	checkErr(wErr)
 
@@ -58,7 +58,11 @@ func writeJobs(jobs []extractedJob) {
 }
 
 func getPage(page int) []extractedJob {
+
 	var jobs []extractedJob
+
+	c := make(chan extractedJob)
+
 	pageURL := baseUrl + "&start=" + strconv.Itoa(page*50)
 	fmt.Println("Requesting", pageURL)
 	res, err := http.Get(pageURL)
@@ -71,15 +75,19 @@ func getPage(page int) []extractedJob {
 	checkErr(err)
 	searchCards := doc.Find(".tapItem")
 	searchCards.Each(func(i int, card *goquery.Selection) {
-		job := extractJob(card)
-		jobs = append(jobs, job)
+		go extractJob(card, c)
 	})
+
+	for i := 0; i <= searchCards.Length(); i++ {
+		job := <-c
+		jobs = append(jobs, job)
+	}
 
 	return jobs
 
 }
 
-func extractJob(card *goquery.Selection) extractedJob {
+func extractJob(card *goquery.Selection, c chan<- extractedJob) {
 	id, _ := card.Find("div>h2>a").Attr("data-jk")
 	//text := s.Find("h2>a").Attr('"da')
 
@@ -88,7 +96,7 @@ func extractJob(card *goquery.Selection) extractedJob {
 	salary := cleanString(card.Find(".salary-snippet").Text())
 	summary := cleanString(card.Find(".job-snippet").Text())
 
-	return extractedJob{
+	c <- extractedJob{
 		id:       id,
 		title:    title,
 		location: location,
