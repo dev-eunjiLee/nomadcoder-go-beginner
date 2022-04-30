@@ -75,10 +75,10 @@ func extractJob(card *goquery.Selection, c chan<- extractedJob) {
 	id, _ := card.Find("div>h2>a").Attr("data-jk")
 	//text := s.Find("h2>a").Attr('"da')
 
-	title := cleanString(card.Find("a>span").Text())
-	location := cleanString(card.Find(".companyLocation").Text())
-	salary := cleanString(card.Find(".salary-snippet").Text())
-	summary := cleanString(card.Find(".job-snippet").Text())
+	title := CleanString(card.Find("a>span").Text())
+	location := CleanString(card.Find(".companyLocation").Text())
+	salary := CleanString(card.Find(".salary-snippet").Text())
+	summary := CleanString(card.Find(".job-snippet").Text())
 
 	c <- extractedJob{
 		id:       id,
@@ -150,7 +150,8 @@ func checkCode(res *http.Response) {
 	}
 }
 
-func cleanString(str string) string {
+// CleanString cleans a string
+func CleanString(str string) string {
 	// strings.Fields: string을 모든 단어마다 분리해 string 배열로 반환
 	// strings.TrimSpace:  string의 앞 뒤 공백 제거
 	// strings.Join(string, 합칠 때 사용할 구분자): string 배열 합치서 하나의 string으로 리턴
