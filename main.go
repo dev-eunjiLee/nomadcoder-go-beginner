@@ -10,6 +10,14 @@ import (
 
 var baseUrl string = "https://kr.indeed.com/%EC%B7%A8%EC%97%85?q=python&limit=50&vjk=6dd48f3771d01215"
 
+type extractedJob struct {
+	id       string
+	title    string
+	location string
+	salary   string
+	summary  string
+}
+
 func main() {
 	totalPages := getPages()
 	fmt.Println(totalPages)
@@ -31,9 +39,14 @@ func getPage(page int) {
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	checkErr(err)
 	searchCards := doc.Find(".tapItem")
-	searchCards.Each(func(i int, s *goquery.Selection) {
-		id, _ := s.Find("div>h2>a").Attr("data-jk")
+	searchCards.Each(func(i int, card *goquery.Selection) {
+		id, _ := card.Find("div>h2>a").Attr("data-jk")
 		//text := s.Find("h2>a").Attr('"da')
+
+		title := card.Find("a>span").Text()
+		location := card.Find(".companyLocation").Text()
+		fmt.Println(title)
+		fmt.Println(location)
 		fmt.Println(id)
 	})
 }
@@ -74,3 +87,5 @@ func checkCode(res *http.Response) {
 		log.Fatalln("Request failed with Status: ", res.StatusCode)
 	}
 }
+
+func cleanString(str string) string {}
