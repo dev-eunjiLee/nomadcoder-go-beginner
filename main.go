@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 var baseUrl string = "https://kr.indeed.com/%EC%B7%A8%EC%97%85?q=python&limit=50&vjk=6dd48f3771d01215"
@@ -20,14 +21,19 @@ type extractedJob struct {
 
 func main() {
 	totalPages := getPages()
-	fmt.Println(totalPages)
+
+	var jobs []extractedJob
 
 	for i := 0; i < totalPages; i++ {
-		getPage(i)
+		extractedJobs := getPage(i)
+		jobs = append(jobs, extractedJobs...)
 	}
+
+	fmt.Println(jobs)
 }
 
-func getPage(page int) {
+func getPage(page int) []extractedJob {
+	var jobs []extractedJob
 	pageURL := baseUrl + "&start=" + strconv.Itoa(page*50)
 	fmt.Println("Requesting", pageURL)
 	res, err := http.Get(pageURL)
@@ -40,15 +46,31 @@ func getPage(page int) {
 	checkErr(err)
 	searchCards := doc.Find(".tapItem")
 	searchCards.Each(func(i int, card *goquery.Selection) {
-		id, _ := card.Find("div>h2>a").Attr("data-jk")
-		//text := s.Find("h2>a").Attr('"da')
-
-		title := card.Find("a>span").Text()
-		location := card.Find(".companyLocation").Text()
-		fmt.Println(title)
-		fmt.Println(location)
-		fmt.Println(id)
+		job := extractJob(card)
+		jobs = append(jobs, job)
 	})
+
+	return jobs
+
+}
+
+func extractJob(card *goquery.Selection) extractedJob {
+	id, _ := card.Find("div>h2>a").Attr("data-jk")
+	//text := s.Find("h2>a").Attr('"da')
+
+	title := cleanString(card.Find("a>span").Text())
+	location := cleanString(card.Find(".companyLocation").Text())
+	salary := cleanString(card.Find(".salary-snippet").Text())
+	summary := cleanString(card.Find(".job-snippet").Text())
+
+	return extractedJob{
+		id:       id,
+		title:    title,
+		location: location,
+		salary:   salary,
+		summary:  summary,
+	}
+
 }
 
 // getPages: 페이지 수 리턴하는 함수
@@ -88,4 +110,9 @@ func checkCode(res *http.Response) {
 	}
 }
 
-func cleanString(str string) string {}
+func cleanString(str string) string {
+	// strings.Fields: string을 모든 단어마다 분리해 string 배열로 반환
+	// strings.TrimSpace:  string의 앞 뒤 공백 제거
+	// strings.Join(string, 합칠 때 사용할 구분자): string 배열 합치서 하나의 string으로 리턴
+	return strings.Join(strings.Fields(strings.TrimSpace(str)), " ")
+}
